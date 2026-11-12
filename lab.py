@@ -103,7 +103,7 @@ class Docker:
 
     def shell_in_dir(self, directory, cmd, input=None, timeout=900):
         """Chạy lệnh shell trong thư mục compose của CVAT (máy chạy Docker)."""
-        if self.wsl:
+        if self.wsl or (os.name == "nt" and (directory.startswith("/") or directory.startswith("~"))):
             return subprocess.run(["wsl", "-e", "sh", "-c", f"cd '{directory}' && {cmd}"], capture_output=True, text=True,
                                   input=input, timeout=timeout, encoding="utf-8", errors="replace")
         if os.name == "nt":
@@ -113,7 +113,7 @@ class Docker:
                               timeout=timeout, encoding="utf-8", errors="replace")
 
     def containers(self):
-        out = self.out("ps", "-a", "--filter", "name=cvat", "--filter", "name=traefik", "--format", "{{.Names}}\t{{.State}}")
+        out = self.out("ps", "-a", "--filter", "name=cvat", "--filter", "name=traefik", "--filter", "name=nuclio", "--format", "{{.Names}}\t{{.State}}")
         return dict(line.split("\t", 1) for line in out.splitlines() if "\t" in line)
 
 
