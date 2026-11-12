@@ -6,13 +6,13 @@ Dữ liệu: 12 ảnh người COCO val2017 (Lin et al., 2014) và 8 ảnh chân
 
 - Họ tên: Nguyễn Sỹ Kiên
 - MSSV: 2A202603245
-- Email: kien.ns2A202603245@sis.hust.edu.vn
+- Email: 26ai.kienns@vinuni.edu.vn
 - Link repository: https://github.com/justAchillGuy8386/K5-L2-Day04-NguyenSyKien-2A202603245-KeypointPose-Student
 - Phiên bản CVAT (Help → About): CVAT 2.74.1 (Community Edition)
 - Máy: hệ điều hành Windows 11 · RAM 16 GB (Docker cấp phát 6.7 GB) · chạy CVAT chế độ đầy đủ
 - Bộ ảnh (`src/exports/assignment.json` do `lab.py setup` tạo): có
-- Giờ bắt đầu: 17:00
-- Giờ kết thúc: 18:40
+- Giờ bắt đầu: 16:30
+- Giờ kết thúc: 19:30
 
 ## 1. Kiểm tra label (CP0)
 
