@@ -38,6 +38,28 @@
    "task_id": 11,
    "job_id": 9,
    "task_name": "faces-NguyenSyKien"
+  },
+  "persons-extra": {
+   "task_id": 12,
+   "job_id": 10,
+   "task_name": "persons-extra-NguyenSyKien"
+  },
+  "faces-extra": {
+   "task_id": 13,
+   "job_id": 11,
+   "task_name": "faces-extra-NguyenSyKien"
   }
- }
+ },
+ "persons_extra": [
+  "000000188948.jpg",
+  "000000323525.jpg",
+  "000000507223.jpg"
+ ],
+ "faces_extra": [
+  "face_274219.jpg",
+  "face_280788.jpg",
+  "face_379585.jpg",
+  "face_494518.jpg",
+  "face_68290.jpg"
+ ]
 }

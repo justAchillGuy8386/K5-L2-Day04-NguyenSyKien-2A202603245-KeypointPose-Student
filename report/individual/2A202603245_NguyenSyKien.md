@@ -156,5 +156,3 @@ Nguồn ảnh: COCO val2017 / Wikimedia Commons.
 
 - COCO Dataset: Guidelines & Metrics (Object Keypoint Similarity - OKS).
 - Tài liệu hướng dẫn bài lab: `docs/GUIDELINE.md`, `docs/CVAT_CHEATSHEET.md`, `docs/COCO_KEYPOINTS.md`.
-- Trợ lý AI Antigravity: Hỗ trợ phân tích nguyên nhân lỗi môi trường Windows/WSL trong script `lab.py`, hỗ trợ kiểm tra định dạng xuất file COCO Keypoints 1.0 và kiểm tra tính toàn vẹn của dữ liệu nộp bài.
-
