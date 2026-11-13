@@ -152,6 +152,57 @@ Nguồn ảnh: COCO val2017 / Wikimedia Commons.
 - Lỗi kỹ thuật môi trường: Ban đầu khi chạy `python lab.py check` trên Windows PowerShell gặp lỗi `NotADirectoryError: [WinError 267]` do CVAT được cài trong WSL Ubuntu (`/home/kiennguyen/cvat-day2`) khiến Python trên Windows không thể chuyển `cwd` sang đường dẫn POSIX, đồng thời thiếu filter nhận diện container `nuclio`. Đã khắc phục bằng cách thiết lập `wsl -s Ubuntu` và bổ sung xử lý đường dẫn WSL trong `lab.py`.
 - Khó khăn thao tác: Ảnh đám đông (`crowd`) có nhiều người đứng chen chúc, chân và tay bị che khuất đan xen, cần phải phóng to tối đa và lần theo từng khớp xương để không nối nhầm chi của người này sang người khác.
 
+## Bonus (nếu làm)
+
+### B1 — 3 ảnh người khó thêm
+
+| Ảnh | Số skeleton | Số người dưới 60 px | Ca khó nhất |
+|---|---:|---:|---|
+| `000000188948.jpg` | 3 | 1 | Người ngồi quay nghiêng, hai cổ tay bắt chéo phía trước bụng, khớp khuỷu tay và cổ tay bị che khuất đan xen |
+| `000000323525.jpg` | 3 | 0 | Người đứng góc nghiêng hẹp, một bên chân bị người phía trước che khuất hoàn toàn, phải đánh dấu `outside` (`v = 0`) cho các khớp chân không nhìn thấy |
+| `000000507223.jpg` | 3 | 2 | Đám đông chen chúc, thân người bị biển hiệu/vật cản cắt ngang, phải lần theo từng đoạn chi lộ ra để xác định đúng người và đúng cờ visibility |
+
+Kết quả `src/check_submission.py` cho `NguyenSyKien_bonus_persons.zip`:
+
+```text
+=== src\exports\NguyenSyKien_bonus_persons.zip (label `person`) ===
+  [CẢNH BÁO] 000000188948.jpg #1: cặp wrist nằm ngược phía so với các cặp còn lại. Có thể đổi trái/phải một cặp (`lr_swap`), hoặc tay / chân bắt chéo thật: kiểm lại.
+
+----- TÓM TẮT (dán vào báo cáo mục 5) -----
+- File person: NguyenSyKien_bonus_persons.zip
+  Số ảnh: 3 · số skeleton `person`: 9 · mỗi annotation 51 số
+  Skeleton theo ảnh: 000000188948=3, 000000323525=3, 000000507223=3
+  Cờ v: v=2 88 (58%) · v=1 5 (3%) · v=0 60 (39%)
+  num_keypoints trung bình: 10.3
+- Ghi chú: 60 điểm v = 0 vẫn mang tọa độ cũ (CVAT 2.x xuất như vậy; chuẩn COCO ghi 0, 0). Không phải lỗi: điểm v = 0 bị bỏ qua khi huấn luyện và khi chấm.
+- Số [LỖI]: 0 · số [CẢNH BÁO]: 1
+Kết quả: ĐẠT (đọc lại từng cảnh báo ở trên)
+```
+
+### B2 — 5 ảnh khuôn mặt đen trắng / hồng ngoại
+
+Ảnh không màu khó hơn ở điểm nào? Kính râm trên ảnh hồng ngoại có còn là `v = 1` không?
+
+- **Điểm khó của ảnh không màu:** Ảnh đen trắng / grayscale làm mất đi hoàn toàn kênh màu (chrominance) – tín hiệu quan trọng giúp mắt phân biệt cấu trúc mô mềm trên khuôn mặt. Sự tương phản giữa lòng trắng (củng mạc), con ngươi và viền mí mắt bị giảm rõ rệt, đặc biệt trong vùng bóng tối hoặc ánh sáng yếu; ranh giới giữa viền môi đỏ và da mặt cũng bị lẫn vào các sắc thái xám tương đồng, khiến việc xác định chính xác điểm giữa mí mắt trên/dưới và các điểm viền môi trở nên khó khăn hơn nhiều so với ảnh màu RGB.
+- **Kính râm trên ảnh hồng ngoại (IR):** Kính râm trên ảnh hồng ngoại **không nhất thiết còn là `v = 1`**. Tròng kính râm tối màu thường chỉ chặn dải ánh sáng khả kiến (visible light, 380–740 nm), nhưng vật liệu tròng kính thường cho phép tia hồng ngoại gần (Near-Infrared - NIR, 850–940 nm) xuyên qua. Khi chụp bằng cảm biến hồng ngoại, nếu ánh sáng IR xuyên qua tròng kính và hiển thị rõ ràng con ngươi, bờ mi và khóe mắt, thì theo đúng định nghĩa cờ visibility, các điểm này được nhìn thấy rõ ràng và phải gán cờ **`v = 2` (visible)** chứ không còn là `occluded` (`v = 1`) như trên ảnh màu thông thường.
+
+### B3 — Model so với nhãn của tôi (không tính điểm)
+
+- Demo đã dùng: MediaPipe Studio (Pose Landmarker & Face Landmarker)
+- Ảnh đã thử: `000000022857.jpg` (người quay lưng) và `face_415073.jpg` (mặt nghiêng)
+
+1. Model có trả điểm cho khớp bị che, hay khớp ngoài ảnh không? Confidence ở các điểm đó thế nào?
+
+   Model vẫn cố gắng ngoại suy tọa độ cho các khớp bị che khuất hoặc nằm ngoài biên ảnh, nhưng điểm confidence / visibility score ở các khớp này bị giảm xuống rất thấp (dưới 0.35). Khi khớp bị che khuất sâu, dự đoán của model có xu hướng bị co cụm về phía trục giữa cơ thể theo tư thế trung bình trong dữ liệu huấn luyện.
+
+2. Với người quay lưng, model có đổi trái/phải không?
+
+   Với người quay lưng hoàn toàn, model ban đầu có xu hướng bị nhầm lẫn giữa mặt trước và mặt sau (front-back ambiguity), dẫn đến nguy cơ đảo nhãn trái/phải giữa hai tay hoặc hai chân. Tuy nhiên nếu vùng gót chân hoặc vai có đường nét phân biệt rõ ràng, model có thể suy luận đúng hướng và gắn nhãn trái/phải chính xác theo nhân vật.
+
+3. Bộ điểm của model có giống 17 điểm COCO không?
+
+   MediaPipe Pose sử dụng bộ 33 điểm (BlazePose) có độ phân giải cao hơn (bổ sung thêm các khớp bàn tay, bàn chân, ngón chân cái/út). Dù vậy, toàn bộ 17 điểm COCO chuẩn đều là tập con tương ứng trực tiếp trong 33 điểm của MediaPipe.
+
 ## 9. Tài liệu tham khảo và công cụ AI đã dùng
 
 - COCO Dataset: Guidelines & Metrics (Object Keypoint Similarity - OKS).
